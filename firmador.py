@@ -66,7 +66,7 @@ def main() -> int:
     try:
         cfg = load_config(args.config)
     except ValueError as e:
-        print(f"ERROR de configuración: {e}")
+        print(f"No se pudo iniciar el firmador:\n{e}")
         return 1
 
     apply_overrides(cfg, args)
@@ -81,7 +81,7 @@ def main() -> int:
     try:
         signer = load_signer(cfg.pfx_path, password.encode("utf-8"))
     except ValueError as e:
-        print(f"ERROR: {e}")
+        print(f"No se pudo iniciar el firmador:\n{e}")
         return 1
 
     resultados = []

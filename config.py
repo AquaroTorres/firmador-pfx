@@ -45,29 +45,41 @@ def _resolve(base: Path, raw: str) -> Path:
 def _req(raw: dict, key: str, config_path: Path) -> str:
     v = raw.get(key)
     if not v:
-        raise ValueError(f"Falta la clave obligatoria '{key}' en {config_path}")
+        raise ValueError(
+            f"Falta configurar '{key}' en {config_path}.\n"
+            f"  Agrega una línea como '{key}=...' en ese archivo y vuelve a intentar."
+        )
     return v
+
+
+def _require_path(base: Path, raw: dict, key: str, config_path: Path, label: str, kind: str) -> Path:
+    raw_value = _req(raw, key, config_path)
+    resolved = _resolve(base, raw_value)
+    exists = resolved.is_dir() if kind == "dir" else resolved.is_file()
+    if not exists:
+        raise ValueError(
+            f"No se encontró {label}.\n"
+            f"  Valor en {config_path.name}: {key}={raw_value}\n"
+            f"  Ruta buscada: {resolved}\n"
+            f"  Revisa que la ruta sea correcta (relativa a {base}) y que el archivo/carpeta exista."
+        )
+    return resolved
 
 
 def load_config(config_path: str) -> Config:
     config_path = Path(config_path).resolve()
     if not config_path.is_file():
-        raise ValueError(f"No se encontró el archivo de configuración: {config_path}")
+        raise ValueError(
+            f"No se encontró el archivo de configuración: {config_path}\n"
+            f"  Copia 'config.env.example' a 'config.env' (o indica la ruta correcta con --config)."
+        )
 
     raw = dotenv_values(config_path)
     base = app_dir()
 
-    in_dir = _resolve(base, _req(raw, "IN_DIR", config_path))
-    if not in_dir.is_dir():
-        raise ValueError(f"IN_DIR no existe o no es una carpeta: {in_dir}")
-
-    pfx_path = _resolve(base, _req(raw, "PFX_PATH", config_path))
-    if not pfx_path.is_file():
-        raise ValueError(f"PFX_PATH no existe: {pfx_path}")
-
-    image_path = _resolve(base, _req(raw, "IMAGE_PATH", config_path))
-    if not image_path.is_file():
-        raise ValueError(f"IMAGE_PATH no existe: {image_path}")
+    in_dir = _require_path(base, raw, "IN_DIR", config_path, "la carpeta de entrada (IN_DIR)", "dir")
+    pfx_path = _require_path(base, raw, "PFX_PATH", config_path, "el certificado PFX (PFX_PATH)", "file")
+    image_path = _require_path(base, raw, "IMAGE_PATH", config_path, "la imagen de la firma (IMAGE_PATH)", "file")
 
     sign_page_raw = _req(raw, "SIGN_PAGE", config_path).strip().lower()
     sign_page = "last" if sign_page_raw == "last" else int(sign_page_raw)

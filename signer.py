@@ -17,8 +17,11 @@ def load_signer(pfx_path: Path, password: bytes) -> signers.SimpleSigner:
     signer = signers.SimpleSigner.load_pkcs12(pfx_file=str(pfx_path), passphrase=password)
     if signer is None:
         raise ValueError(
-            f"No se pudo cargar el certificado PFX ({pfx_path}): "
-            "ruta inválida o clave incorrecta"
+            "No se pudo abrir el certificado digital.\n"
+            f"  Archivo: {pfx_path}\n"
+            "  Revisa que:\n"
+            "    - la clave ingresada sea la correcta, y\n"
+            "    - el archivo sea un certificado .pfx/.p12 válido (no esté dañado o incompleto)."
         )
     return signer
 
