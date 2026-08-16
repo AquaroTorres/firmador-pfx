@@ -10,7 +10,7 @@ No necesitas instalar Python: se usa el ejecutable ya compilado.
 
 1. Ve a la sección **[Releases](../../releases)** del repositorio y descarga
    el archivo de tu sistema operativo:
-   - **Windows**: `firmador-windows.exe`
+   - **Windows**: `firmador.exe`
    - **macOS** (Apple Silicon: M1/M2/M3/M4): `firmador-macos`
    - **Linux**: `firmador-linux`
 2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado
@@ -19,8 +19,8 @@ No necesitas instalar Python: se usa el ejecutable ya compilado.
 3. Configúralo siguiendo la sección [Configuración](#2-configuración) de
    abajo (certificado, imagen de firma y `config.env`).
 4. Ejecútalo:
-   - **Windows**: doble clic en el `.exe`, o desde una consola
-     `firmador-windows.exe`.
+   - **Windows**: doble clic en `firmador.exe`, o desde una consola
+     `firmador.exe`.
    - **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
      binario sin firma de desarrollador, macOS puede bloquearlo la primera
      vez ("no se puede abrir porque su desarrollador no pudo verificarse");

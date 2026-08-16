@@ -23,7 +23,7 @@ jobs:
             asset_name: firmador-macos
           - os: windows-latest
             artifact_name: firmador.exe
-            asset_name: firmador-windows.exe
+            asset_name: firmador.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -44,7 +44,10 @@ jobs:
 
       - name: Renombrar binario para publicar
         shell: bash
-        run: cp "dist/${{ matrix.artifact_name }}" "dist/${{ matrix.asset_name }}"
+        run: |
+          if [ "${{ matrix.artifact_name }}" != "${{ matrix.asset_name }}" ]; then
+            cp "dist/${{ matrix.artifact_name }}" "dist/${{ matrix.asset_name }}"
+          fi
 
       - name: Subir como artifact del workflow
         uses: actions/upload-artifact@v4
