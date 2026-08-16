@@ -22,8 +22,9 @@ pip install -r requirements/requirements.txt
 firmador-pfx/
 ├── firmador.py           # ejecutable: python3 firmador.py
 ├── README.md
+├── config.env.example     # plantilla de configuración
+├── config.env             # tu configuración (no versionado)
 ├── src/                   # código (config, sello, firma)
-├── config/                # config.env.example y tu config.env (no versionado)
 ├── requirements/          # dependencias (runtime y empaquetado)
 ├── certs/                 # tu certificado .pfx (no versionado)
 ├── assets/                # tu imagen de firma
@@ -36,15 +37,14 @@ firmador-pfx/
 
 - Certificado digital en `certs/tu-certificado.pfx`.
 - Imagen de la firma (plantilla) en `assets/tu-firma.png`.
-- Copia `config/config.env.example` a `config/config.env` y ajusta las rutas y valores a los tuyos:
+- Copia `config.env.example` a `config.env` y ajusta las rutas y valores a los tuyos:
 
 ```bash
-cp config/config.env.example config/config.env
+cp config.env.example config.env
 ```
 
-`config/config.env` **no se sube a git** (está en `.gitignore`) porque
-referencia tu certificado y tus datos personales — cada persona/organización
-mantiene el suyo.
+`config.env` **no se sube a git** (está en `.gitignore`) porque referencia tu
+certificado y tus datos personales — cada persona/organización mantiene el suyo.
 
 **Empaquetado opcional** (para distribuir sin que el usuario final instale Python):
 
@@ -55,10 +55,11 @@ pyinstaller --onefile --name firmador firmador.py
 
 Esto genera `dist/firmador` (Linux). Para Windows, el mismo comando debe
 ejecutarse en una máquina Windows — PyInstaller no puede cross-compilar desde
-Linux. El binario espera las carpetas `config/`, `certs/`, `assets/`, `in/` y
-`out/` junto a él (rutas relativas al propio ejecutable, no al directorio
-desde el que se invoque), así que cópialo a la raíz del proyecto para usarlo,
-o copia esas carpetas junto al binario si lo distribuyes por separado.
+Linux. El binario espera `config.env` y las carpetas `certs/`, `assets/`,
+`in/` y `out/` junto a él (rutas relativas al propio ejecutable, no al
+directorio desde el que se invoque), así que cópialo a la raíz del proyecto
+para usarlo, o copia esos archivos/carpetas junto al binario si lo
+distribuyes por separado.
 
 ## 2. Uso
 

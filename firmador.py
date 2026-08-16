@@ -34,8 +34,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--config",
-        default=str(app_dir() / "config" / "config.env"),
-        help="Ruta al archivo de configuración .env (default: config/config.env junto al ejecutable)",
+        default=str(app_dir() / "config.env"),
+        help="Ruta al archivo de configuración .env (default: config.env junto al ejecutable)",
     )
     parser.add_argument(
         "--password",

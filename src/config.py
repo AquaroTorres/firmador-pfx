@@ -75,7 +75,7 @@ def load_config(config_path: str) -> Config:
     if not config_path.is_file():
         raise ValueError(
             f"No se encontró el archivo de configuración: {config_path}\n"
-            f"  Copia 'config/config.env.example' a 'config/config.env' "
+            f"  Copia 'config.env.example' a 'config.env' "
             f"(o indica la ruta correcta con --config)."
         )
 
