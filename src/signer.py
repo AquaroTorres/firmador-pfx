@@ -8,7 +8,7 @@ from pyhanko.pdf_utils.images import PdfImage
 from pyhanko.pdf_utils.incremental_writer import IncrementalPdfFileWriter
 from pyhanko.sign import fields, signers
 
-from config import Config
+from .config import Config
 
 
 def load_signer(pfx_path: Path, password: bytes) -> signers.SimpleSigner:

@@ -13,34 +13,52 @@ git clone git@github.com:AquaroTorres/firmador-pfx.git
 cd firmador-pfx
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements/requirements.txt
+```
+
+**Estructura del proyecto**:
+
+```
+firmador-pfx/
+├── firmador.py           # ejecutable: python3 firmador.py
+├── README.md
+├── src/                   # código (config, sello, firma)
+├── config/                # config.env.example y tu config.env (no versionado)
+├── requirements/          # dependencias (runtime y empaquetado)
+├── certs/                 # tu certificado .pfx (no versionado)
+├── assets/                # tu imagen de firma
+├── docs/                  # imágenes de este README
+├── in/                    # PDFs a firmar
+└── out/                   # PDFs firmados
 ```
 
 **Coloca tus archivos**:
 
 - Certificado digital en `certs/tu-certificado.pfx`.
 - Imagen de la firma (plantilla) en `assets/tu-firma.png`.
-- Copia `config.env.example` a `config.env` y ajusta las rutas y valores a los tuyos:
+- Copia `config/config.env.example` a `config/config.env` y ajusta las rutas y valores a los tuyos:
 
 ```bash
-cp config.env.example config.env
+cp config/config.env.example config/config.env
 ```
 
-`config.env` **no se sube a git** (está en `.gitignore`) porque referencia tu
-certificado y tus datos personales — cada persona/organización mantiene el suyo.
+`config/config.env` **no se sube a git** (está en `.gitignore`) porque
+referencia tu certificado y tus datos personales — cada persona/organización
+mantiene el suyo.
 
 **Empaquetado opcional** (para distribuir sin que el usuario final instale Python):
 
 ```bash
-pip install -r requirements-build.txt
+pip install -r requirements/requirements-build.txt
 pyinstaller --onefile --name firmador firmador.py
 ```
 
 Esto genera `dist/firmador` (Linux). Para Windows, el mismo comando debe
 ejecutarse en una máquina Windows — PyInstaller no puede cross-compilar desde
-Linux. El binario espera `config.env`, tu certificado y tu imagen de firma
-junto a él (rutas relativas al propio ejecutable, no al directorio desde el
-que se invoque).
+Linux. El binario espera las carpetas `config/`, `certs/`, `assets/`, `in/` y
+`out/` junto a él (rutas relativas al propio ejecutable, no al directorio
+desde el que se invoque), así que cópialo a la raíz del proyecto para usarlo,
+o copia esas carpetas junto al binario si lo distribuyes por separado.
 
 ## 2. Uso
 
@@ -52,9 +70,12 @@ que se invoque).
    ```
 
    (o `./dist/firmador` si usas el binario empaquetado).
-3. Te pedirá la clave del certificado de forma interactiva (no queda visible
-   en pantalla ni se guarda en ningún archivo). También puedes pasarla con
-   `--password`.
+3. La clave del certificado se toma, en este orden: `--password`, luego
+   `PFX_PASSWORD` en `config.env` (si la definiste ahí), y si ninguna está
+   presente se pide de forma interactiva (no queda visible en pantalla).
+   Guardarla en `config.env` es más cómodo pero menos seguro: cualquiera con
+   acceso a ese archivo puede leerla; solo hazlo si necesitas ejecutar el
+   firmador sin interacción (ej. una tarea programada).
 4. Los PDFs firmados quedan en `out/`, con el mismo nombre que en `in/`. Al
    final se imprime un resumen `[OK]`/`[ERROR]` por archivo.
 
@@ -64,7 +85,7 @@ sin tener que editarlo):
 | Flag | Equivale a | Descripción |
 |---|---|---|
 | `--config RUTA` | — | Usar otro archivo de configuración |
-| `--password CLAVE` | — | Clave del PFX (si no se pasa, se pide por teclado) |
+| `--password CLAVE` | `PFX_PASSWORD` | Clave del PFX |
 | `--sign-page` | `SIGN_PAGE` | Página a firmar: número (1-based) o `last` |
 | `--pos-x` / `--pos-y` | `POS_X` / `POS_Y` | Posición del sello en la página |
 | `--stamp-width` / `--stamp-height` | `STAMP_WIDTH` / `STAMP_HEIGHT` | Tamaño del sello en la página |
@@ -75,7 +96,7 @@ sin tener que editarlo):
 **dentro de la página del PDF**, en puntos PDF (72 puntos = 1 pulgada), medidos
 desde la **esquina inferior izquierda de la página**:
 
-![Coordenadas del sello en la página PDF](posicion_firma.png)
+![Coordenadas del sello en la página PDF](docs/posicion_firma.png)
 
 - `POS_X`/`POS_Y` = esquina inferior izquierda del sello.
 - `STAMP_WIDTH`/`STAMP_HEIGHT` = ancho y alto del sello, creciendo hacia la

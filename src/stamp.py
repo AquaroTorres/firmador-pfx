@@ -1,7 +1,7 @@
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
-from config import Config
+from .config import Config
 
 # Separación entre la línea de nombres y la de apellidos, como múltiplo del
 # tamaño de fuente (interlineado tipográfico típico).

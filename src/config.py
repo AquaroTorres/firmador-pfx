@@ -7,7 +7,10 @@ from dotenv import dotenv_values
 def app_dir() -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parent
+    # sys.argv[0] es el script de entrada (firmador.py, en la raíz del
+    # proyecto), a diferencia de __file__ que apuntaría a esta carpeta
+    # (src/) ya que config.py vive ahí, no en la raíz.
+    return Path(sys.argv[0]).resolve().parent
 
 
 @dataclass
@@ -15,6 +18,7 @@ class Config:
     in_dir: Path
     out_dir: Path
     pfx_path: Path
+    pfx_password: "str | None"
     sign_page: "str | int"
     pos_x: int
     pos_y: int
@@ -71,7 +75,8 @@ def load_config(config_path: str) -> Config:
     if not config_path.is_file():
         raise ValueError(
             f"No se encontró el archivo de configuración: {config_path}\n"
-            f"  Copia 'config.env.example' a 'config.env' (o indica la ruta correcta con --config)."
+            f"  Copia 'config/config.env.example' a 'config/config.env' "
+            f"(o indica la ruta correcta con --config)."
         )
 
     raw = dotenv_values(config_path)
@@ -91,6 +96,7 @@ def load_config(config_path: str) -> Config:
         in_dir=in_dir,
         out_dir=_resolve(base, raw.get("OUT_DIR", "./out")),
         pfx_path=pfx_path,
+        pfx_password=raw.get("PFX_PASSWORD") or None,
         sign_page=sign_page,
         pos_x=int(_req(raw, "POS_X", config_path)),
         pos_y=int(_req(raw, "POS_Y", config_path)),

@@ -7,9 +7,9 @@ from pathlib import Path
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 
-from config import app_dir, load_config
-from stamp import build_stamp_image
-from signer import load_signer, sign_one_pdf
+from src.config import app_dir, load_config
+from src.stamp import build_stamp_image
+from src.signer import load_signer, sign_one_pdf
 
 # pyHanko registra en el logger los errores de carga del PFX con traceback
 # incluido antes de devolver None; ya los reportamos con un mensaje propio,
@@ -34,10 +34,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--config",
-        default=str(app_dir() / "config.env"),
-        help="Ruta al archivo de configuración .env (default: config.env junto al ejecutable)",
+        default=str(app_dir() / "config" / "config.env"),
+        help="Ruta al archivo de configuración .env (default: config/config.env junto al ejecutable)",
     )
-    parser.add_argument("--password", help="Clave del certificado PFX")
+    parser.add_argument(
+        "--password",
+        help="Clave del certificado PFX (si no se indica, se usa PFX_PASSWORD del config "
+        "o se pide de forma interactiva)",
+    )
     parser.add_argument("--sign-page", help="Página a firmar: entero 1-based o 'last'")
     parser.add_argument("--pos-x", type=int, help="Posición X del sello en el PDF (puntos)")
     parser.add_argument("--pos-y", type=int, help="Posición Y del sello en el PDF (puntos)")
@@ -76,7 +80,11 @@ def main() -> int:
         print(f"No se encontraron PDFs en {cfg.in_dir}")
         return 0
 
-    password = args.password or getpass.getpass(f"Clave del certificado {cfg.pfx_path.name}: ")
+    password = (
+        args.password
+        or cfg.pfx_password
+        or getpass.getpass(f"Clave del certificado {cfg.pfx_path.name}: ")
+    )
 
     try:
         signer = load_signer(cfg.pfx_path, password.encode("utf-8"))
