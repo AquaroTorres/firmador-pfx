@@ -8,9 +8,9 @@ firma generados automáticamente sobre una imagen de plantilla.
 
 1. Ve a la sección **[Releases](../../releases)** del repositorio y descarga
    el archivo de tu sistema operativo:
-   - **Windows**: `firmador.exe`
-   - **macOS** (Apple Silicon: M1/M2/M3/M4): `firmador-macos`
-   - **Linux**: `firmador-linux`
+   - **Windows**: [firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)
+   - **macOS** (Apple Silicon: M1/M2/M3/M4): [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos)
+   - **Linux**: [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
 2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado y dentro crea 4 carpetas, el resultado debe verse así:
 ```
 firmador/               (o como hayas llamado a tu carpeta)
