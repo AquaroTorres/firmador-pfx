@@ -18,9 +18,12 @@ jobs:
           - os: ubuntu-latest
             artifact_name: firmador
             asset_name: firmador-linux
+          - os: macos-latest
+            artifact_name: firmador
+            asset_name: firmador-macos
           - os: windows-latest
             artifact_name: firmador.exe
-            asset_name: firmador-windows
+            asset_name: firmador-windows.exe
 
     runs-on: ${{ matrix.os }}
 
@@ -39,16 +42,20 @@ jobs:
       - name: Compilar ejecutable
         run: pyinstaller --onefile --name firmador firmador.py
 
+      - name: Renombrar binario para publicar
+        shell: bash
+        run: cp "dist/${{ matrix.artifact_name }}" "dist/${{ matrix.asset_name }}"
+
       - name: Subir como artifact del workflow
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
-          path: dist/${{ matrix.artifact_name }}
+          path: dist/${{ matrix.asset_name }}
 
       - name: Adjuntar a la Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/${{ matrix.artifact_name }}
+          files: dist/${{ matrix.asset_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

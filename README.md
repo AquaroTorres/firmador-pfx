@@ -10,15 +10,25 @@ No necesitas instalar Python: se usa el ejecutable ya compilado.
 
 1. Ve a la sección **[Releases](../../releases)** del repositorio y descarga
    el archivo de tu sistema operativo:
-   - **Windows**: `firmador-windows` (contiene `firmador.exe`)
-   - **Linux**: `firmador-linux` (contiene `firmador`)
-2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado.
+   - **Windows**: `firmador-windows.exe`
+   - **macOS** (Apple Silicon: M1/M2/M3/M4): `firmador-macos`
+   - **Linux**: `firmador-linux`
+2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado
+   (puedes renombrarlo a `firmador` / `firmador.exe` si quieres, el nombre no
+   importa para su funcionamiento).
 3. Configúralo siguiendo la sección [Configuración](#2-configuración) de
    abajo (certificado, imagen de firma y `config.env`).
 4. Ejecútalo:
-   - **Windows**: doble clic en `firmador.exe`, o desde una consola
-     `firmador.exe`.
-   - **Linux**: `chmod +x firmador && ./firmador`.
+   - **Windows**: doble clic en el `.exe`, o desde una consola
+     `firmador-windows.exe`.
+   - **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
+     binario sin firma de desarrollador, macOS puede bloquearlo la primera
+     vez ("no se puede abrir porque su desarrollador no pudo verificarse");
+     click derecho → Abrir, o ejecuta antes
+     `xattr -d com.apple.quarantine firmador-macos`. Si tienes un Mac con
+     procesador Intel (no Apple Silicon), usa la
+     [instalación avanzada](#instalación-avanzada-código-fuente) en su lugar.
+   - **Linux**: `chmod +x firmador-linux && ./firmador-linux`.
 
 Te va a pedir la clave del certificado si no la definiste en `config.env` (ver
 más abajo). Los PDFs firmados quedan en `out/`, con el mismo nombre que
@@ -47,10 +57,6 @@ firmador/               (o como hayas llamado a tu carpeta)
    ```bash
    cp config.env.example config.env
    ```
-
-   `config.env` no se sube a git (está en `.gitignore`) porque referencia tu
-   certificado y tus datos personales — cada persona/organización mantiene
-   el suyo.
 
 ### Clave del certificado
 
@@ -103,17 +109,21 @@ Sobrescriben lo definido en `config.env` sin tener que editarlo:
 | `--pos-x` / `--pos-y` | `POS_X` / `POS_Y` | Posición del sello en la página |
 | `--stamp-width` / `--stamp-height` | `STAMP_WIDTH` / `STAMP_HEIGHT` | Tamaño del sello en la página |
 
-## 3. Compilación y releases automáticos
+## 3. Información técnica
+
+### Compilación y releases automáticos
 
 Cada vez que se publica un tag de versión (`vX.Y.Z`) en el repositorio,
 [GitHub Actions](.github/workflows/build-executables.yml) compila
-automáticamente `firmador` (Linux) y `firmador.exe` (Windows) en runners
-reales de cada sistema operativo — necesario porque PyInstaller no
-cross-compila entre sistemas y algunas dependencias (`cryptography`, `lxml`)
-requieren compilarse en el sistema destino — y los publica en la sección
-[Releases](../../releases) del repositorio.
+automáticamente los ejecutables de Windows, macOS y Linux en runners reales
+de cada sistema operativo — necesario porque PyInstaller no cross-compila
+entre sistemas y algunas dependencias (`cryptography`, `lxml`) requieren
+compilarse en el sistema destino — y los publica en la sección
+[Releases](../../releases) del repositorio. El runner de macOS de GitHub es
+Apple Silicon (arm64), por eso ese binario no corre en Macs con procesador
+Intel.
 
-## 4. Instalación avanzada (código fuente)
+### Instalación avanzada (código fuente)
 
 Para desarrollar o compilar el ejecutable tú mismo.
 
@@ -159,7 +169,7 @@ sistema operativo en el que lo ejecutes. El binario espera `config.env` y las
 carpetas `certs/`, `assets/`, `in/` y `out/` junto a él (rutas relativas al
 propio ejecutable, no al directorio desde el que se invoque).
 
-## 5. Tecnología usada
+### Tecnología usada
 
 - **[Python](https://www.python.org/)** 3.10+
 - **[pyHanko](https://github.com/MatthiasValvekens/pyHanko)** — firma digital PAdES con certificados PKCS#12 (`.pfx`) y estampado visual
