@@ -6,16 +6,6 @@ firma generados automáticamente sobre una imagen de plantilla.
 
 ## 1. Instalación
 
-**Requisitos**: Python 3.10 o superior.
-
-```bash
-git clone git@github.com:AquaroTorres/firmador-pfx.git
-cd firmador-pfx
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements/requirements.txt
-```
-
 **Estructura del proyecto**:
 
 ```
@@ -33,7 +23,45 @@ firmador-pfx/
 └── out/                   # PDFs firmados
 ```
 
-**Coloca tus archivos**:
+### Opción A: usar el ejecutable ya compilado (sin instalar Python)
+
+Cada vez que se publica un tag de versión (`vX.Y.Z`) en el repositorio,
+[GitHub Actions](.github/workflows/build-executables.yml) compila
+automáticamente los ejecutables de Windows y Linux y los deja disponibles en
+la sección **[Releases](../../releases)** del repositorio:
+
+- **Windows**: descarga `firmador-windows` (contiene `firmador.exe`).
+- **Linux**: descarga `firmador-linux` (contiene `firmador`).
+
+Pasos:
+
+1. Descarga el ejecutable de tu sistema desde Releases y colócalo en una
+   carpeta propia.
+2. Junto a él, copia `config.env.example` → `config.env` (ajustado a tus
+   datos) y las carpetas `certs/`, `assets/`, `in/` y `out/` — ver
+   [Configuración](#configuración) más abajo.
+3. Ejecútalo:
+   - **Windows**: doble clic en `firmador.exe`, o desde una consola
+     `firmador.exe`.
+   - **Linux**: `chmod +x firmador && ./firmador`.
+
+No necesitas tener Python instalado para esta opción.
+
+### Opción B: instalar desde el código fuente (Python)
+
+**Requisitos**: Python 3.10 o superior.
+
+```bash
+git clone git@github.com:AquaroTorres/firmador-pfx.git
+cd firmador-pfx
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements/requirements.txt
+```
+
+Se ejecuta con `python3 firmador.py` (ver sección [Uso](#2-uso)).
+
+### Configuración
 
 - Certificado digital en `certs/tu-certificado.pfx`.
 - Imagen de la firma (plantilla) en `assets/tu-firma.png`.
@@ -46,20 +74,24 @@ cp config.env.example config.env
 `config.env` **no se sube a git** (está en `.gitignore`) porque referencia tu
 certificado y tus datos personales — cada persona/organización mantiene el suyo.
 
-**Empaquetado opcional** (para distribuir sin que el usuario final instale Python):
+### Compilar el ejecutable tú mismo (opcional)
+
+Los ejecutables de Releases ya cubren esto para Windows y Linux, pero también
+puedes generarlo localmente:
 
 ```bash
 pip install -r requirements/requirements-build.txt
 pyinstaller --onefile --name firmador firmador.py
 ```
 
-Esto genera `dist/firmador` (Linux). Para Windows, el mismo comando debe
-ejecutarse en una máquina Windows — PyInstaller no puede cross-compilar desde
-Linux. El binario espera `config.env` y las carpetas `certs/`, `assets/`,
-`in/` y `out/` junto a él (rutas relativas al propio ejecutable, no al
-directorio desde el que se invoque), así que cópialo a la raíz del proyecto
-para usarlo, o copia esos archivos/carpetas junto al binario si lo
-distribuyes por separado.
+Esto genera `dist/firmador` (o `dist/firmador.exe` en Windows) para el
+sistema operativo en el que lo ejecutes — PyInstaller no cross-compila entre
+sistemas, por eso el build de Windows se hace en un runner de GitHub Actions
+en vez de generarse desde Linux/Mac. El binario espera `config.env` y las
+carpetas `certs/`, `assets/`, `in/` y `out/` junto a él (rutas relativas al
+propio ejecutable, no al directorio desde el que se invoque), así que
+cópialo a la raíz del proyecto para usarlo, o copia esos archivos/carpetas
+junto al binario si lo distribuyes por separado.
 
 ## 2. Uso
 
@@ -70,7 +102,8 @@ distribuyes por separado.
    python3 firmador.py
    ```
 
-   (o `./dist/firmador` si usas el binario empaquetado).
+   (o `./firmador` / `firmador.exe` si usas el ejecutable descargado de
+   Releases, o `./dist/firmador` si lo compilaste tú mismo).
 3. La clave del certificado se toma, en este orden: `--password`, luego
    `PFX_PASSWORD` en `config.env` (si la definiste ahí), y si ninguna está
    presente se pide de forma interactiva (no queda visible en pantalla).
@@ -127,3 +160,4 @@ automáticamente (ej. `2026-08-05 18:59:04 -04:00`).
 - **[pypdf](https://pypdf.readthedocs.io/)** — lectura de metadatos del PDF (conteo de páginas) y detección de archivos corruptos
 - **[python-dotenv](https://github.com/theskumar/python-dotenv)** — parseo del archivo de configuración `config.env`
 - **[PyInstaller](https://pyinstaller.org/)** — empaquetado como ejecutable standalone (sin requerir Python instalado)
+- **[GitHub Actions](.github/workflows/build-executables.yml)** — compila y publica automáticamente los ejecutables de Windows y Linux al crear un tag de versión

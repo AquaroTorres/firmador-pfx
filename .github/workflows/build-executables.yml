@@ -1,0 +1,50 @@
+name: Build executables
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: firmador
+            asset_name: firmador-linux
+          - os: windows-latest
+            artifact_name: firmador.exe
+            asset_name: firmador-windows
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements/requirements.txt
+          pip install -r requirements/requirements-build.txt
+
+      - name: Compilar ejecutable
+        run: pyinstaller --onefile --name firmador firmador.py
+
+      - name: Subir como artifact del workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: dist/${{ matrix.artifact_name }}
+
+      - name: Adjuntar a la Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ matrix.artifact_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
