@@ -13,28 +13,13 @@ No necesitas instalar Python: se usa el ejecutable ya compilado.
    - **Windows**: `firmador.exe`
    - **macOS** (Apple Silicon: M1/M2/M3/M4): `firmador-macos`
    - **Linux**: `firmador-linux`
-2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado, dentro crea 4 carpetas:
+2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado y dentro crea 4 carpetas:
    - assets
    - certs
    - in
    - out
 3. Configúralo siguiendo la sección [Configuración](#2-configuración) de
    abajo (certificado, imagen de firma y `config.env`).
-4. Ejecútalo:
-   - **Windows**: doble clic en `firmador.exe`, o desde una consola
-     `firmador.exe`.
-   - **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
-     binario sin firma de desarrollador, macOS puede bloquearlo la primera
-     vez ("no se puede abrir porque su desarrollador no pudo verificarse");
-     click derecho → Abrir, o ejecuta antes
-     `xattr -d com.apple.quarantine firmador-macos`. Si tienes un Mac con
-     procesador Intel (no Apple Silicon), usa la
-     [instalación avanzada](#instalación-avanzada-código-fuente) en su lugar.
-   - **Linux**: `chmod +x firmador-linux && ./firmador-linux`.
-
-Te va a pedir la clave del certificado si no la definiste en `config.env` (ver
-más abajo). Los PDFs firmados quedan en `out/`, con el mismo nombre que
-tenían en `in/`, y al final se imprime un resumen `[OK]`/`[ERROR]` por archivo.
 
 ## 2. Configuración
 
@@ -55,11 +40,21 @@ firmador/               (o como hayas llamado a tu carpeta)
 1. Copia tu certificado a `certs/tu-certificado.pfx`.
 2. Copia tu imagen de firma a `assets/tu-firma.png`.
 3. Copia `config.env.example` a `config.env` y ajusta las rutas y valores:
+4. Ejecútalo:
+   - **Windows**: doble clic en `firmador.exe`, o desde una consola
+     `firmador.exe`.
+   - **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
+     binario sin firma de desarrollador, macOS puede bloquearlo la primera
+     vez ("no se puede abrir porque su desarrollador no pudo verificarse");
+     click derecho → Abrir, o ejecuta antes
+     `xattr -d com.apple.quarantine firmador-macos`. Si tienes un Mac con
+     procesador Intel (no Apple Silicon), usa la
+     [instalación avanzada](#instalación-avanzada-código-fuente) en su lugar.
+   - **Linux**: `chmod +x firmador-linux && ./firmador-linux`.
 
-   ```bash
-   cp config.env.example config.env
-   ```
-
+Te va a pedir la clave del certificado si no la definiste en `config.env` (ver
+más abajo). Los PDFs firmados quedan en `out/`, con el mismo nombre que
+tenían en `in/`, y al final se imprime un resumen `[OK]`/`[ERROR]` por archivo.
 ### Clave del certificado
 
 Se toma, en este orden: `--password` en la línea de comandos, luego
