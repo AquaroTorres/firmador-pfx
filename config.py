@@ -102,7 +102,7 @@ def load_config(config_path: str) -> Config:
         name_font_size=int(raw.get("NAME_FONT_SIZE", 28)),
         name_pos_x=int(raw.get("NAME_POS_X", 0)),
         name_pos_y=int(raw.get("NAME_POS_Y", 0)),
-        date_format=raw.get("DATE_FORMAT", "%d-%m-%Y %H:%M:%S"),
+        date_format=raw.get("DATE_FORMAT", "%Y-%m-%d %H:%M:%S"),
         date_font_size=int(raw.get("DATE_FONT_SIZE", 18)),
         date_pos_x=int(raw.get("DATE_POS_X", 0)),
         date_pos_y=int(raw.get("DATE_POS_Y", 0)),
