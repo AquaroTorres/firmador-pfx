@@ -13,9 +13,11 @@ No necesitas instalar Python: se usa el ejecutable ya compilado.
    - **Windows**: `firmador.exe`
    - **macOS** (Apple Silicon: M1/M2/M3/M4): `firmador-macos`
    - **Linux**: `firmador-linux`
-2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado
-   (puedes renombrarlo a `firmador` / `firmador.exe` si quieres, el nombre no
-   importa para su funcionamiento).
+2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado, dentro crea 4 carpetas:
+   - assets
+   - certs
+   - in
+   - out
 3. Configúralo siguiendo la sección [Configuración](#2-configuración) de
    abajo (certificado, imagen de firma y `config.env`).
 4. Ejecútalo:
@@ -40,14 +42,14 @@ Junto al ejecutable necesitas estos archivos y carpetas:
 
 ```
 firmador/               (o como hayas llamado a tu carpeta)
-├── firmador / firmador.exe
-├── config.env           # tu configuración (copiado desde config.env.example)
-├── certs/
-│   └── tu-certificado.pfx
 ├── assets/
 │   └── tu-firma.png
-├── in/                   # PDFs a firmar
-└── out/                  # PDFs firmados (se generan solos)
+├── certs/
+│   └── tu-certificado.pfx
+├── config.env           # tu configuración (copiado desde config.env.example)
+├── in/                  # PDFs a firmar
+├── out/                 # PDFs firmados (se generan solos)
+└── firmador.exe
 ```
 
 1. Copia tu certificado a `certs/tu-certificado.pfx`.
