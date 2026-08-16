@@ -1,0 +1,10 @@
+*.pfx
+config.env
+out/*
+!out/.gitkeep
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+*.spec
