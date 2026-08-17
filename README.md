@@ -19,9 +19,6 @@ sistema operativo:
 - **macOS** (Apple Silicon: M1/M2/M3/M4): [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos)
 - **Linux**: [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
 
-> ¿Mac con procesador Intel? El binario publicado es solo para Apple
-> Silicon; usa la [instalación desde código fuente](#instalación-desde-código-fuente) en su lugar.
-
 ### Paso 2 — Prepara la carpeta
 
 Crea una carpeta para el firmador y coloca ahí el ejecutable descargado.
