@@ -45,7 +45,7 @@ firmador/               (o como hayas llamado a tu carpeta)
    posición y el tamaño del sello, o cualquier otro detalle, revisa la
    [configuración avanzada](#2-configuración-avanzada).
 
-config.env
+`config.env`
 ```
 # --- Carpetas ---
 IN_DIR=./in
@@ -53,11 +53,7 @@ OUT_DIR=./out
 
 # --- Certificado PFX ---
 PFX_PATH=./certs/tu-certificado.pfx
-# Clave del PFX (opcional). Prioridad: --password en la línea de comandos >
-# PFX_PASSWORD de aquí > se pide de forma interactiva si ambas quedan vacías.
-# Dejarla vacía es más seguro (nadie con acceso a este archivo puede leerla);
-# solo complétala aquí si necesitas ejecutar el firmador sin interacción
-# (ej. una tarea programada).
+# Clave del PFX (opcional)
 PFX_PASSWORD=
 
 # --- Ubicación del sello en la página del PDF (en puntos) ---
@@ -68,8 +64,8 @@ STAMP_WIDTH=180
 STAMP_HEIGHT=44
 
 # --- Imagen de fondo del sello ---
-# El ancho/alto real de esta imagen debe ser proporcional a STAMP_WIDTH/
-# STAMP_HEIGHT de arriba (misma relación de aspecto), o se verá estirada.
+# El ancho/alto real de esta imagen debe ser proporcional a STAMP_WIDTH/STAMP_HEIGHT
+# de arriba (misma relación de aspecto), o se verá estirada.
 IMAGE_PATH=./assets/firma-template.png
 
 # --- Texto dinámico: nombre del firmante ---
