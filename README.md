@@ -4,14 +4,29 @@ Firma digitalmente (PAdES) todos los PDFs de una carpeta usando un certificado
 `.pfx`/`.p12`, estampando visualmente un sello con nombre, apellido y fecha de
 firma generados automáticamente sobre una imagen de plantilla.
 
-## 1. Instalación
+**Contenidos**: [Instalación](#1-instalación-guía-rápida) ·
+[Configuración avanzada](#2-configuración-avanzada) ·
+[Información técnica](#3-información-técnica)
 
-1. Ve a la sección **[Releases](../../releases)** del repositorio y descarga
-   el archivo de tu sistema operativo:
-   - **Windows**: [firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)
-   - **macOS** (Apple Silicon: M1/M2/M3/M4): [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos)
-   - **Linux**: [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
-2. Crea una carpeta para el firmador y coloca ahí el ejecutable descargado y dentro crea 4 carpetas, el resultado debe verse así:
+## 1. Instalación (guía rápida)
+
+### Paso 1 — Descarga el ejecutable
+
+Ve a la sección **[Releases](../../releases)** y descarga el archivo de tu
+sistema operativo:
+
+- **Windows**: [firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)
+- **macOS** (Apple Silicon: M1/M2/M3/M4): [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos)
+- **Linux**: [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
+
+> ¿Mac con procesador Intel? El binario publicado es solo para Apple
+> Silicon; usa la [instalación desde código fuente](#instalación-desde-código-fuente) en su lugar.
+
+### Paso 2 — Prepara la carpeta
+
+Crea una carpeta para el firmador y coloca ahí el ejecutable descargado.
+Debes crear 4 carpetas dentro; el resultado final debe verse así:
+
 ```
 firmador/               (o como hayas llamado a tu carpeta)
 ├── assets/
@@ -23,25 +38,34 @@ firmador/               (o como hayas llamado a tu carpeta)
 ├── out/                 # PDFs firmados (se generan solos)
 └── firmador.exe
 ```
-3. Configúración:
-   1. Copia tu certificado a `certs/tu-certificado.pfx`.
-   2. Copia tu imagen de firma a `assets/tu-firma.png`.
-   3. Copia `config.env.example` a `config.env` y ajusta las rutas y valores:
-   4. Ejecútalo:
-      - **Windows**: doble clic en `firmador.exe`, o desde una consola
-        `firmador.exe`.
-      - **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
-        binario sin firma de desarrollador, macOS puede bloquearlo la primera
-        vez ("no se puede abrir porque su desarrollador no pudo verificarse");
-        click derecho → Abrir, o ejecuta antes
-        `xattr -d com.apple.quarantine firmador-macos`. Si tienes un Mac con
-        procesador Intel (no Apple Silicon), usa la
-        [instalación avanzada](#instalación-avanzada-código-fuente) en su lugar.
-      - **Linux**: `chmod +x firmador-linux && ./firmador-linux`.
 
-Te va a pedir la clave del certificado si no la definiste en `config.env` (ver
-más abajo). Los PDFs firmados quedan en `out/`, con el mismo nombre que
-tenían en `in/`, y al final se imprime un resumen `[OK]`/`[ERROR]` por archivo.
+### Paso 3 — Configura
+
+1. Copia tu certificado a `certs/tu-certificado.pfx`.
+2. Copia tu imagen de firma a `assets/tu-firma.png`.
+3. Copia `config.env.example` a `config.env` y ajusta las rutas y valores
+   (nombre, apellido, ruta del certificado y de la imagen). Para ajustar la
+   posición y el tamaño del sello, o cualquier otro detalle, revisa la
+   [configuración avanzada](#2-configuración-avanzada).
+
+### Paso 4 — Ejecuta
+
+- **Windows**: doble clic en `firmador.exe`, o desde una consola
+  `firmador.exe`.
+- **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
+  binario sin firma de desarrollador, macOS puede bloquearlo la primera
+  vez ("no se puede abrir porque su desarrollador no pudo verificarse");
+  click derecho → Abrir, o ejecuta antes
+  `xattr -d com.apple.quarantine firmador-macos`.
+- **Linux**: `chmod +x firmador-linux && ./firmador-linux`.
+
+Te va a pedir la clave del certificado si no la definiste en `config.env`
+(ver [clave del certificado](#clave-del-certificado)). Los PDFs firmados
+quedan en `out/`, con el mismo nombre que tenían en `in/`, y al final se
+imprime un resumen `[OK]`/`[ERROR]` por archivo.
+
+## 2. Configuración avanzada
+
 ### Clave del certificado
 
 Se toma, en este orden: `--password` en la línea de comandos, luego
@@ -81,6 +105,16 @@ firma (tamaño independiente `DATE_FONT_SIZE`, normalmente menor, desde
 `DATE_POS_X`/`DATE_POS_Y`), con el huso horario local agregado
 automáticamente (ej. `2026-08-05 18:59:04 -04:00`).
 
+Otras variables relacionadas en `config.env`:
+
+| Variable | Descripción |
+|---|---|
+| `SIGN_PAGE` | Página a firmar: número (1-based) o `last` |
+| `DATE_FORMAT` | Formato de la fecha (sintaxis `strftime`), antes de agregar el huso horario |
+| `FONT_PATH` | Ruta a una fuente `.ttf`/`.otf` propia (opcional; vacío usa la fuente por defecto) |
+| `TEXT_COLOR` | Color del texto en RGB, formato `R,G,B` (ej. `0,0,0` para negro) |
+| `SIGN_REASON` / `SIGN_LOCATION` / `SIGN_CONTACT_INFO` | Metadatos de la firma digital PAdES (no visibles en el sello, sí en las propiedades de firma del PDF) |
+
 ### Parámetros opcionales de línea de comandos
 
 Sobrescriben lo definido en `config.env` sin tener que editarlo:
@@ -107,7 +141,7 @@ compilarse en el sistema destino — y los publica en la sección
 Apple Silicon (arm64), por eso ese binario no corre en Macs con procesador
 Intel.
 
-### Instalación avanzada (código fuente)
+### Instalación desde código fuente
 
 Para desarrollar o compilar el ejecutable tú mismo.
 
@@ -122,7 +156,7 @@ pip install -r requirements/requirements.txt
 ```
 
 Se ejecuta con `python3 firmador.py` (mismas opciones y `config.env` que en
-la sección [Instalación](#1-instalación)).
+la sección [Instalación](#1-instalación-guía-rápida)).
 
 **Estructura del proyecto**:
 
@@ -161,4 +195,4 @@ propio ejecutable, no al directorio desde el que se invoque).
 - **[pypdf](https://pypdf.readthedocs.io/)** — lectura de metadatos del PDF (conteo de páginas) y detección de archivos corruptos
 - **[python-dotenv](https://github.com/theskumar/python-dotenv)** — parseo del archivo de configuración `config.env`
 - **[PyInstaller](https://pyinstaller.org/)** — empaquetado como ejecutable standalone (sin requerir Python instalado)
-- **[GitHub Actions](.github/workflows/build-executables.yml)** — compila y publica automáticamente los ejecutables de Windows y Linux al crear un tag de versión
+- **[GitHub Actions](.github/workflows/build-executables.yml)** — compila y publica automáticamente los ejecutables de Windows, macOS y Linux al crear un tag de versión
