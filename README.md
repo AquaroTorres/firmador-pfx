@@ -22,7 +22,7 @@ sistema operativo:
 ### Paso 2 — Prepara la carpeta
 
 Crea una carpeta para el firmador y coloca ahí el ejecutable descargado.
-Debes crear 4 carpetas dentro; el resultado final debe verse así:
+Debes crear 4 carpetas dentro (assets, certs, in, out); el resultado final debe verse así:
 
 ```
 firmador/               (o como hayas llamado a tu carpeta)
