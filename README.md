@@ -1,81 +1,110 @@
 # Firmador PDF en masa
 
-Firma digitalmente (PAdES) todos los PDFs de una carpeta usando un certificado
-`.pfx`/`.p12`, estampando visualmente un sello con nombre, apellido y fecha de
-firma generados automáticamente sobre una imagen de plantilla.
+Programa que firma automáticamente todos los PDFs de una carpeta usando tu
+certificado digital (`.pfx`), agregando además un sello visual con tu nombre
+y la fecha de firma.
 
-**Contenidos**: [Instalación](#1-instalación-guía-rápida) ·
-[Configuración avanzada](#2-configuración-avanzada) ·
-[Información técnica](#3-información-técnica)
+## Instalación en Windows (guía rápida)
 
-## 1. Instalación (guía rápida)
+### 1. Descarga el programa
 
-### Paso 1 — Descarga el ejecutable
+Entra a la sección **[Releases](../../releases)** y descarga
+**[firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)**.
 
-Ve a la sección **[Releases](../../releases)** y descarga el archivo de tu
-sistema operativo:
+### 2. Crea la carpeta de trabajo
 
-- **Windows**: [firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)
-- **macOS** (Apple Silicon: M1/M2/M3/M4): [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos)
-- **Linux**: [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
-
-> ¿Mac con procesador Intel? El binario publicado es solo para Apple
-> Silicon; usa la [instalación desde código fuente](#instalación-desde-código-fuente) en su lugar.
-
-### Paso 2 — Prepara la carpeta
-
-Crea una carpeta para el firmador y coloca ahí el ejecutable descargado.
-Debes crear 4 carpetas dentro; el resultado final debe verse así:
+Crea una carpeta en tu computador (por ejemplo `Firmador` en el Escritorio) y
+mueve ahí el `firmador.exe` descargado. Dentro de esa carpeta crea estas 4
+carpetas: `assets`, `certs`, `in` y `out`. Al final debe verse así:
 
 ```
-firmador/               (o como hayas llamado a tu carpeta)
+Firmador/
 ├── assets/
 │   └── tu-firma.png
 ├── certs/
 │   └── tu-certificado.pfx
-├── config.env           # tu configuración (copiado desde config.env.example)
-├── in/                  # PDFs a firmar
-├── out/                 # PDFs firmados (se generan solos)
+├── config.env
+├── in/
+├── out/
 └── firmador.exe
 ```
 
-### Paso 3 — Configura
+### 3. Copia tus archivos
 
-1. Copia tu certificado a `certs/tu-certificado.pfx`.
-2. Copia tu imagen de firma a `assets/tu-firma.png`.
-3. Copia `config.env.example` a `config.env` y ajusta las rutas y valores
-   (nombre, apellido, ruta del certificado y de la imagen). Para ajustar la
-   posición y el tamaño del sello, o cualquier otro detalle, revisa la
-   [configuración avanzada](#2-configuración-avanzada).
+- Copia tu certificado digital dentro de `certs/` (el archivo `.pfx` que te
+  dieron).
+- Copia la imagen de tu firma/sello dentro de `assets/` (por ejemplo
+  `tu-firma.png`).
 
-### Paso 4 — Ejecuta
+### 4. Crea tu configuración
 
-- **Windows**: doble clic en `firmador.exe`, o desde una consola
-  `firmador.exe`.
-- **macOS**: `chmod +x firmador-macos && ./firmador-macos`. Al ser un
-  binario sin firma de desarrollador, macOS puede bloquearlo la primera
-  vez ("no se puede abrir porque su desarrollador no pudo verificarse");
-  click derecho → Abrir, o ejecuta antes
-  `xattr -d com.apple.quarantine firmador-macos`.
-- **Linux**: `chmod +x firmador-linux && ./firmador-linux`.
+Descarga
+**[config.env.example](https://raw.githubusercontent.com/AquaroTorres/firmador-pfx/main/config.env.example)**,
+guárdalo en la carpeta `Firmador` y renómbralo a `config.env`. Ábrelo con el
+Bloc de notas y completa al menos estos datos:
 
-Te va a pedir la clave del certificado si no la definiste en `config.env`
-(ver [clave del certificado](#clave-del-certificado)). Los PDFs firmados
-quedan en `out/`, con el mismo nombre que tenían en `in/`, y al final se
-imprime un resumen `[OK]`/`[ERROR]` por archivo.
+| En `config.env` | Qué poner |
+|---|---|
+| `PFX_PATH` | `./certs/tu-certificado.pfx` (el nombre real de tu archivo) |
+| `IMAGE_PATH` | `./assets/tu-firma.png` (el nombre real de tu imagen) |
+| `SIGNER_FIRST_NAME` | Tu(s) nombre(s) |
+| `SIGNER_LAST_NAME` | Tu(s) apellido(s) |
 
-## 2. Configuración avanzada
+Guarda el archivo. El resto de las opciones ya vienen con valores que
+funcionan; si quieres ajustar la posición o tamaño del sello, mira la
+[configuración avanzada](#configuración-avanzada-opcional) más abajo.
+
+### 5. Usa el programa
+
+1. Coloca los PDFs que quieres firmar dentro de la carpeta `in/`.
+2. Haz doble clic en `firmador.exe`.
+3. Si no guardaste la clave del certificado en `config.env`, el programa te
+   la va a pedir (no se muestra en pantalla mientras la escribes).
+4. Al terminar, tus PDFs firmados van a estar en la carpeta `out/`, con el
+   mismo nombre que tenían en `in/`.
+
+Verás un resumen al final indicando qué archivos se firmaron bien (`OK`) y
+cuáles fallaron (`ERROR`), con el motivo.
+
+> **¿Windows bloquea el programa?** Si aparece un aviso de "Windows protegió
+> tu PC", haz clic en **Más información** y luego en **Ejecutar de todas
+> formas**. Esto pasa porque el `.exe` no está firmado por un desarrollador
+> registrado en Microsoft; el programa es seguro y su código es público en
+> este repositorio.
+
+## ¿Usas macOS o Linux?
+
+El proceso es el mismo (pasos 1 a 5), pero cambia el archivo que descargas y
+cómo lo ejecutas:
+
+- **macOS** (Apple Silicon: M1/M2/M3/M4): descarga
+  [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos),
+  luego en una terminal, dentro de la carpeta del programa, ejecuta
+  `chmod +x firmador-macos && ./firmador-macos`. La primera vez macOS puede
+  bloquearlo por no tener firma de desarrollador — click derecho → Abrir, o
+  ejecuta antes `xattr -d com.apple.quarantine firmador-macos`. Si tu Mac es
+  Intel (no Apple Silicon), usa la
+  [instalación desde código fuente](#instalación-desde-código-fuente).
+- **Linux**: descarga
+  [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
+  y ejecuta `chmod +x firmador-linux && ./firmador-linux`.
+
+## Configuración avanzada (opcional)
+
+Para la mayoría de los usuarios, los 4 datos del paso 4 son suficientes. Si
+quieres ajustar la posición del sello, el texto o cómo se guarda la clave del
+certificado, sigue leyendo.
 
 ### Clave del certificado
 
 Se toma, en este orden: `--password` en la línea de comandos, luego
 `PFX_PASSWORD` en `config.env` (si la definiste ahí), y si ninguna está
-presente se pide de forma interactiva (no queda visible en pantalla).
-Guardarla en `config.env` es más cómodo pero menos seguro: cualquiera con
-acceso a ese archivo puede leerla; solo hazlo si necesitas ejecutar el
-firmador sin interacción (ej. una tarea programada).
+presente se pide de forma interactiva. Guardarla en `config.env` es más
+cómodo pero menos seguro: cualquiera con acceso a ese archivo puede leerla;
+solo hazlo si necesitas ejecutar el firmador sin interacción (ej. una tarea
+programada).
 
-### Coordenadas y tamaño del sello
+### Posición y tamaño del sello
 
 `POS_X`/`POS_Y`/`STAMP_WIDTH`/`STAMP_HEIGHT` (en `config.env`) ubican el sello
 **dentro de la página del PDF**, en puntos PDF (72 puntos = 1 pulgada), medidos
@@ -96,7 +125,7 @@ mide 754×185 px (relación ≈ 4,08:1); por eso `config.env.example` usa
 `STAMP_WIDTH=180` / `STAMP_HEIGHT=44` (relación ≈ 4,09:1). Si usas tu propia
 imagen, calcula `STAMP_HEIGHT = STAMP_WIDTH / (ancho_px / alto_px)`.
 
-### Texto dinámico (nombre, apellido y fecha)
+### Texto sobre el sello (nombre, apellido y fecha)
 
 Sobre esa misma imagen se dibujan 3 líneas de texto, en píxeles de la imagen
 (no de la página): nombres y apellidos (mismo tamaño, `NAME_FONT_SIZE`,
@@ -113,7 +142,7 @@ Otras variables relacionadas en `config.env`:
 | `DATE_FORMAT` | Formato de la fecha (sintaxis `strftime`), antes de agregar el huso horario |
 | `FONT_PATH` | Ruta a una fuente `.ttf`/`.otf` propia (opcional; vacío usa la fuente por defecto) |
 | `TEXT_COLOR` | Color del texto en RGB, formato `R,G,B` (ej. `0,0,0` para negro) |
-| `SIGN_REASON` / `SIGN_LOCATION` / `SIGN_CONTACT_INFO` | Metadatos de la firma digital PAdES (no visibles en el sello, sí en las propiedades de firma del PDF) |
+| `SIGN_REASON` / `SIGN_LOCATION` / `SIGN_CONTACT_INFO` | Metadatos de la firma digital (no visibles en el sello, sí en las propiedades de firma del PDF) |
 
 ### Parámetros opcionales de línea de comandos
 
@@ -127,7 +156,10 @@ Sobrescriben lo definido en `config.env` sin tener que editarlo:
 | `--pos-x` / `--pos-y` | `POS_X` / `POS_Y` | Posición del sello en la página |
 | `--stamp-width` / `--stamp-height` | `STAMP_WIDTH` / `STAMP_HEIGHT` | Tamaño del sello en la página |
 
-## 3. Información técnica
+## Información técnica
+
+Esta sección es para desarrolladores que quieran compilar el programa o
+modificar el código.
 
 ### Compilación y releases automáticos
 
@@ -156,7 +188,7 @@ pip install -r requirements/requirements.txt
 ```
 
 Se ejecuta con `python3 firmador.py` (mismas opciones y `config.env` que en
-la sección [Instalación](#1-instalación-guía-rápida)).
+la sección [Instalación](#instalación-en-windows-guía-rápida)).
 
 **Estructura del proyecto**:
 
