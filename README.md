@@ -45,6 +45,60 @@ firmador/               (o como hayas llamado a tu carpeta)
    posición y el tamaño del sello, o cualquier otro detalle, revisa la
    [configuración avanzada](#2-configuración-avanzada).
 
+config.env
+```
+# --- Carpetas ---
+IN_DIR=./in
+OUT_DIR=./out
+
+# --- Certificado PFX ---
+PFX_PATH=./certs/tu-certificado.pfx
+# Clave del PFX (opcional). Prioridad: --password en la línea de comandos >
+# PFX_PASSWORD de aquí > se pide de forma interactiva si ambas quedan vacías.
+# Dejarla vacía es más seguro (nadie con acceso a este archivo puede leerla);
+# solo complétala aquí si necesitas ejecutar el firmador sin interacción
+# (ej. una tarea programada).
+PFX_PASSWORD=
+
+# --- Ubicación del sello en la página del PDF (en puntos) ---
+SIGN_PAGE=last
+POS_X=326
+POS_Y=350
+STAMP_WIDTH=180
+STAMP_HEIGHT=44
+
+# --- Imagen de fondo del sello ---
+# El ancho/alto real de esta imagen debe ser proporcional a STAMP_WIDTH/
+# STAMP_HEIGHT de arriba (misma relación de aspecto), o se verá estirada.
+IMAGE_PATH=./assets/firma-template.png
+
+# --- Texto dinámico: nombre del firmante ---
+# Se dibujan como 2 líneas (nombres y apellidos), ambas con NAME_FONT_SIZE.
+# NAME_POS_X/Y ubica la primera línea (nombres); la segunda (apellidos) se
+# dibuja automáticamente justo debajo.
+SIGNER_FIRST_NAME=Nombre1 Nombre2
+SIGNER_LAST_NAME=Apellido1 Apellido2
+NAME_FONT_SIZE=34
+NAME_POS_X=384
+NAME_POS_Y=46
+
+# --- Texto dinámico: fecha de firma ---
+# Se agrega automáticamente el huso horario local con el formato -04:00.
+DATE_FORMAT=%Y-%m-%d %H:%M:%S
+DATE_FONT_SIZE=24
+DATE_POS_X=384
+DATE_POS_Y=140
+
+# --- Fuente y color de texto (opcionales) ---
+FONT_PATH=
+TEXT_COLOR=0,0,0
+
+# --- Metadatos de la firma digital (PAdES) ---
+SIGN_REASON=Firma electrónica avanzada
+SIGN_LOCATION=Nombre Institución
+SIGN_CONTACT_INFO=http://www.sitio-web-institucion.cl
+```
+
 ### Paso 4 — Ejecuta
 
 - **Windows**: doble clic en `firmador.exe`, o desde una consola
