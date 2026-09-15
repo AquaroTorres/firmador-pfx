@@ -12,8 +12,8 @@ from src.config import app_dir, build_config
 
 logging.getLogger("pyhanko").setLevel(logging.CRITICAL)
 
-# Mismos valores que config.env.example, para el botón "Restablecer" y para
-# precargar el formulario la primera vez que se abre (sin config.env previo).
+# Mismos valores que config.env.example, para precargar el formulario la
+# primera vez que se abre (sin config.env previo).
 DEFAULTS = {
     "IN_DIR": "./in",
     "OUT_DIR": "./out",
@@ -185,16 +185,22 @@ class FirmadorGUI:
         ttk.Entry(names, textvariable=self.vars["SIGNER_LAST_NAME"], width=16).grid(row=0, column=3, padx=4)
         row += 1
 
-        for key, label in [
-            ("NAME_POS_X", "Nombre · X"),
-            ("NAME_POS_Y", "Nombre · Y"),
-            ("NAME_FONT_SIZE", "Nombre · tamaño"),
-            ("DATE_POS_X", "Fecha · X"),
-            ("DATE_POS_Y", "Fecha · Y"),
-            ("DATE_FONT_SIZE", "Fecha · tamaño"),
-        ]:
-            self._add_entry(right, row, label, key, width=8)
-            row += 1
+        name_date = ttk.Frame(right)
+        name_date.grid(row=row, column=0, columnspan=2, sticky="w", **pad)
+        for r, (name_key, name_label, date_key, date_label) in enumerate([
+            ("NAME_POS_X", "Nombre · X", "DATE_POS_X", "Fecha · X"),
+            ("NAME_POS_Y", "Nombre · Y", "DATE_POS_Y", "Fecha · Y"),
+            ("NAME_FONT_SIZE", "Nombre · tamaño", "DATE_FONT_SIZE", "Fecha · tamaño"),
+        ]):
+            ttk.Label(name_date, text=name_label).grid(row=r, column=0, sticky="w", pady=2)
+            ttk.Entry(name_date, textvariable=self.vars[name_key], width=8).grid(
+                row=r, column=1, sticky="w", padx=(4, 20), pady=2
+            )
+            ttk.Label(name_date, text=date_label).grid(row=r, column=2, sticky="w", pady=2)
+            ttk.Entry(name_date, textvariable=self.vars[date_key], width=8).grid(
+                row=r, column=3, sticky="w", padx=4, pady=2
+            )
+        row += 1
 
         self._add_entry(right, row, "Formato de fecha", "DATE_FORMAT")
         row += 1
@@ -216,9 +222,8 @@ class FirmadorGUI:
 
         buttons = ttk.Frame(footer)
         buttons.grid(row=0, column=1, rowspan=2, sticky="e")
-        ttk.Button(buttons, text="Restablecer", command=self.on_reset).grid(row=0, column=0, padx=4)
         self.sign_button = ttk.Button(buttons, text="FIRMAR", command=self.on_sign)
-        self.sign_button.grid(row=0, column=1, padx=4)
+        self.sign_button.grid(row=0, column=0, padx=4)
 
         self._set_status_idle()
 
@@ -277,15 +282,6 @@ class FirmadorGUI:
         raw = {key: var.get() for key, var in self.vars.items()}
         raw["SIGN_PAGE"] = "last" if self.last_page_var.get() else (self.page_number_var.get().strip() or "1")
         return raw
-
-    def on_reset(self):
-        for key, value in DEFAULTS.items():
-            self.vars[key].set(value)
-        self.last_page_var.set(True)
-        self.page_number_var.set("")
-        self.remember_var.set(False)
-        self._toggle_page_entry()
-        self._set_status_idle()
 
     # --- firmar ---
 
