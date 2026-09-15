@@ -71,8 +71,9 @@ funcionan; si quieres ajustar la posición o tamaño del sello, mira la
 
 1. Coloca los PDFs que quieres firmar dentro de la carpeta `in/` (el
    formulario muestra cuántos hay en cola).
-2. Completa los campos (certificado, imagen de firma, nombre/apellido) y haz
-   clic en **FIRMAR**.
+2. Completa los campos (certificado, imagen de firma, nombre/apellido) —los
+   que tienen un botón **…** al lado abren el explorador de archivos para
+   buscar la carpeta o el archivo en tu PC— y haz clic en **FIRMAR**.
 3. Si no escribiste la clave del certificado en el formulario, el programa te
    la va a pedir en una ventana aparte.
 4. Una barra de progreso muestra el avance archivo por archivo; al terminar,

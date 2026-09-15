@@ -3,7 +3,7 @@ import queue
 import threading
 import tkinter as tk
 from pathlib import Path
-from tkinter import messagebox, ttk
+from tkinter import filedialog, messagebox, ttk
 
 from dotenv import dotenv_values
 
@@ -40,6 +40,10 @@ DEFAULTS = {
     "SIGN_LOCATION": "Nombre Institución",
     "SIGN_CONTACT_INFO": "http://www.sitio-web-institucion.cl",
 }
+
+CERT_FILETYPES = [("Certificados", "*.pfx *.p12"), ("Todos los archivos", "*.*")]
+IMAGE_FILETYPES = [("Imágenes", "*.png *.jpg *.jpeg *.bmp *.gif"), ("Todos los archivos", "*.*")]
+FONT_FILETYPES = [("Fuentes", "*.ttf *.otf"), ("Todos los archivos", "*.*")]
 
 
 def config_env_path() -> Path:
@@ -112,13 +116,13 @@ class FirmadorGUI:
 
         row = 0
         for key, label in [("IN_DIR", "Entrada (IN_DIR)"), ("OUT_DIR", "Salida (OUT_DIR)")]:
-            self._add_entry(left, row, label, key)
+            self._add_entry(left, row, label, key, browse="dir")
             row += 1
 
-        ttk.Separator(left).grid(row=row, column=0, columnspan=2, sticky="ew", pady=6)
+        ttk.Separator(left).grid(row=row, column=0, columnspan=3, sticky="ew", pady=6)
         row += 1
 
-        self._add_entry(left, row, "Archivo .pfx", "PFX_PATH")
+        self._add_entry(left, row, "Archivo .pfx", "PFX_PATH", browse=CERT_FILETYPES)
         row += 1
         self._add_entry(left, row, "Clave del PFX", "PFX_PASSWORD", show="*")
         row += 1
@@ -129,7 +133,7 @@ class FirmadorGUI:
         ).grid(row=row, column=0, columnspan=2, sticky="w", **pad)
         row += 1
 
-        ttk.Separator(left).grid(row=row, column=0, columnspan=2, sticky="ew", pady=6)
+        ttk.Separator(left).grid(row=row, column=0, columnspan=3, sticky="ew", pady=6)
         row += 1
 
         for key, label in [
@@ -141,7 +145,7 @@ class FirmadorGUI:
             row += 1
 
         row = 0
-        self._add_entry(right, row, "Imagen de fondo", "IMAGE_PATH")
+        self._add_entry(right, row, "Imagen de fondo", "IMAGE_PATH", browse=IMAGE_FILETYPES)
         row += 1
 
         sizes = ttk.Frame(right)
@@ -194,7 +198,7 @@ class FirmadorGUI:
 
         self._add_entry(right, row, "Formato de fecha", "DATE_FORMAT")
         row += 1
-        self._add_entry(right, row, "Fuente (.ttf)", "FONT_PATH")
+        self._add_entry(right, row, "Fuente (.ttf)", "FONT_PATH", browse=FONT_FILETYPES)
         row += 1
         self._add_entry(right, row, "Color R,G,B", "TEXT_COLOR")
         row += 1
@@ -218,13 +222,34 @@ class FirmadorGUI:
 
         self._set_status_idle()
 
-    def _add_entry(self, parent, row, label, key, width=28, show=None):
+    def _add_entry(self, parent, row, label, key, width=28, show=None, browse=None):
         ttk.Label(parent, text=label).grid(row=row, column=0, sticky="w", padx=8, pady=3)
         entry = ttk.Entry(parent, textvariable=self.vars[key], width=width, show=show or "")
         entry.grid(row=row, column=1, sticky="w", padx=8, pady=3)
         if key == "IN_DIR":
             entry.bind("<FocusOut>", lambda e: self.refresh_pdf_count())
+        if browse is not None:
+            ttk.Button(
+                parent, text="…", width=3, command=lambda: self._browse(key, browse)
+            ).grid(row=row, column=2, sticky="w", padx=(0, 8), pady=3)
         return entry
+
+    def _browse(self, key, kind):
+        current = self._resolve_path(self.vars[key].get().strip() or ".")
+        initial_dir = current if current.is_dir() else current.parent
+        if not initial_dir.is_dir():
+            initial_dir = app_dir()
+
+        if kind == "dir":
+            chosen = filedialog.askdirectory(initialdir=str(initial_dir), parent=self.root)
+        else:
+            chosen = filedialog.askopenfilename(
+                initialdir=str(initial_dir), filetypes=kind, parent=self.root
+            )
+        if chosen:
+            self.vars[key].set(chosen)
+            if key == "IN_DIR":
+                self.refresh_pdf_count()
 
     def _toggle_page_entry(self):
         self.page_entry.configure(state="disabled" if self.last_page_var.get() else "normal")
@@ -237,10 +262,12 @@ class FirmadorGUI:
         self.progress["value"] = 0
         self.progress["maximum"] = max(n, 1)
 
-    def _resolve_in_dir(self) -> Path:
-        raw = self.vars["IN_DIR"].get().strip() or "./in"
+    def _resolve_path(self, raw: str) -> Path:
         p = Path(raw).expanduser()
         return p if p.is_absolute() else (app_dir() / p).resolve()
+
+    def _resolve_in_dir(self) -> Path:
+        return self._resolve_path(self.vars["IN_DIR"].get().strip() or "./in")
 
     def refresh_pdf_count(self):
         if not self.running:
