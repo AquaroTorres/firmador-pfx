@@ -146,8 +146,13 @@ class FirmadorGUI:
 
         sizes = ttk.Frame(right)
         sizes.grid(row=row, column=0, columnspan=2, sticky="w", **pad)
-        for i, key in enumerate(["STAMP_WIDTH", "STAMP_HEIGHT", "POS_X", "POS_Y"]):
-            ttk.Label(sizes, text=key).grid(row=0, column=i)
+        for i, (key, label) in enumerate([
+            ("STAMP_WIDTH", "Ancho (pt)"),
+            ("STAMP_HEIGHT", "Alto (pt)"),
+            ("POS_X", "Pos. X"),
+            ("POS_Y", "Pos. Y"),
+        ]):
+            ttk.Label(sizes, text=label).grid(row=0, column=i, padx=3, sticky="w")
             ttk.Entry(sizes, textvariable=self.vars[key], width=7).grid(row=1, column=i, padx=3)
         row += 1
 
