@@ -2,19 +2,26 @@
 
 Programa que firma automáticamente todos los PDFs de una carpeta usando tu
 certificado digital (`.pfx`), agregando además un sello visual con tu nombre
-y la fecha de firma.
+y la fecha de firma. Viene en dos versiones: una **con interfaz gráfica**
+(`firmador-gui.exe`, recomendada si vas a usarlo ocasionalmente y a mano) y
+otra **de consola** (`firmador.exe`, pensada para automatizar o dejar
+corriendo sin intervención). Ambas hacen exactamente lo mismo; esta guía
+cubre las dos.
 
 ## Instalación en Windows (guía rápida)
 
 ### 1. Descarga el programa
 
-Entra a la sección **[Releases](../../releases)** y descarga
-**[firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)**.
+Entra a la sección **[Releases](../../releases)** y descarga el ejecutable
+que prefieras:
+
+- **[firmador-gui.exe](../../releases)** — con ventana y formulario.
+- **[firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador.exe)** — por consola.
 
 ### 2. Crea la carpeta de trabajo
 
 Crea una carpeta en tu computador (por ejemplo `Firmador` en el Escritorio) y
-mueve ahí el `firmador.exe` descargado. Dentro de esa carpeta crea estas 4
+mueve ahí el ejecutable descargado. Dentro de esa carpeta crea estas 4
 carpetas: `assets`, `certs`, `in` y `out`. Al final debe verse así:
 
 ```
@@ -26,7 +33,7 @@ Firmador/
 ├── config.env
 ├── in/
 ├── out/
-└── firmador.exe
+└── firmador-gui.exe   (o firmador.exe, según cuál descargaste)
 ```
 
 ### 3. Copia tus archivos
@@ -38,7 +45,11 @@ Firmador/
 
 ### 4. Crea tu configuración
 
-Descarga
+**Si usas `firmador-gui.exe`**, sáltate este paso: al abrirlo vas a ver un
+formulario para completar estos mismos datos, y el programa guarda
+`config.env` por ti.
+
+**Si usas `firmador.exe` (consola)**, descarga
 **[config.env.example](https://raw.githubusercontent.com/AquaroTorres/firmador-pfx/main/config.env.example)**,
 guárdalo en la carpeta `Firmador` y renómbralo a `config.env`. Ábrelo con el
 Bloc de notas y completa al menos estos datos:
@@ -56,15 +67,27 @@ funcionan; si quieres ajustar la posición o tamaño del sello, mira la
 
 ### 5. Usa el programa
 
+**Con `firmador-gui.exe`**:
+
+1. Coloca los PDFs que quieres firmar dentro de la carpeta `in/` (el
+   formulario muestra cuántos hay en cola).
+2. Completa los campos (certificado, imagen de firma, nombre/apellido) y haz
+   clic en **FIRMAR**.
+3. Si no escribiste la clave del certificado en el formulario, el programa te
+   la va a pedir en una ventana aparte.
+4. Una barra de progreso muestra el avance archivo por archivo; al terminar,
+   los PDFs firmados quedan en `out/`, con el mismo nombre que tenían en
+   `in/`.
+
+**Con `firmador.exe` (consola)**:
+
 1. Coloca los PDFs que quieres firmar dentro de la carpeta `in/`.
 2. Haz doble clic en `firmador.exe`.
 3. Si no guardaste la clave del certificado en `config.env`, el programa te
    la va a pedir (no se muestra en pantalla mientras la escribes).
 4. Al terminar, tus PDFs firmados van a estar en la carpeta `out/`, con el
-   mismo nombre que tenían en `in/`.
-
-Verás un resumen al final indicando qué archivos se firmaron bien (`OK`) y
-cuáles fallaron (`ERROR`), con el motivo.
+   mismo nombre que tenían en `in/`. Verás un resumen indicando qué archivos
+   se firmaron bien (`OK`) y cuáles fallaron (`ERROR`), con el motivo.
 
 > **¿Windows bloquea el programa?** Si aparece un aviso de "Windows protegió
 > tu PC", haz clic en **Más información** y luego en **Ejecutar de todas
@@ -75,19 +98,22 @@ cuáles fallaron (`ERROR`), con el motivo.
 ## ¿Usas macOS o Linux?
 
 El proceso es el mismo (pasos 1 a 5), pero cambia el archivo que descargas y
-cómo lo ejecutas:
+cómo lo ejecutas. En **[Releases](../../releases)** vas a encontrar, para
+cada sistema, la versión de consola y la de interfaz gráfica (`-gui`):
 
 - **macOS** (Apple Silicon: M1/M2/M3/M4): descarga
-  [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos),
-  luego en una terminal, dentro de la carpeta del programa, ejecuta
-  `chmod +x firmador-macos && ./firmador-macos`. La primera vez macOS puede
-  bloquearlo por no tener firma de desarrollador — click derecho → Abrir, o
-  ejecuta antes `xattr -d com.apple.quarantine firmador-macos`. Si tu Mac es
+  [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-macos)
+  o `firmador-gui-macos`, luego en una terminal, dentro de la carpeta del
+  programa, ejecuta `chmod +x firmador-macos && ./firmador-macos` (cambia el
+  nombre si usas la versión gráfica). La primera vez macOS puede bloquearlo
+  por no tener firma de desarrollador — click derecho → Abrir, o ejecuta
+  antes `xattr -d com.apple.quarantine <nombre-del-archivo>`. Si tu Mac es
   Intel (no Apple Silicon), usa la
   [instalación desde código fuente](#instalación-desde-código-fuente).
 - **Linux**: descarga
   [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.0.0/firmador-linux)
-  y ejecuta `chmod +x firmador-linux && ./firmador-linux`.
+  o `firmador-gui-linux`, y ejecuta `chmod +x <nombre-del-archivo> &&
+  ./<nombre-del-archivo>`.
 
 ## Configuración avanzada (opcional)
 
@@ -99,10 +125,13 @@ certificado, sigue leyendo.
 
 Se toma, en este orden: `--password` en la línea de comandos, luego
 `PFX_PASSWORD` en `config.env` (si la definiste ahí), y si ninguna está
-presente se pide de forma interactiva. Guardarla en `config.env` es más
-cómodo pero menos seguro: cualquiera con acceso a ese archivo puede leerla;
-solo hazlo si necesitas ejecutar el firmador sin interacción (ej. una tarea
-programada).
+presente se pide de forma interactiva (en la GUI, con una ventana; en
+consola, sin mostrarla en pantalla). En `firmador-gui.exe` esto se controla
+con el casillero **"Recordar la clave en este equipo"**: si lo dejas
+desmarcado, la clave se usa solo para esa firma y no queda guardada.
+Guardarla en `config.env` es más cómodo pero menos seguro: cualquiera con
+acceso a ese archivo puede leerla; solo hazlo si necesitas ejecutar el
+firmador sin interacción (ej. una tarea programada).
 
 ### Posición y tamaño del sello
 
@@ -165,13 +194,13 @@ modificar el código.
 
 Cada vez que se publica un tag de versión (`vX.Y.Z`) en el repositorio,
 [GitHub Actions](.github/workflows/build-executables.yml) compila
-automáticamente los ejecutables de Windows, macOS y Linux en runners reales
-de cada sistema operativo — necesario porque PyInstaller no cross-compila
-entre sistemas y algunas dependencias (`cryptography`, `lxml`) requieren
-compilarse en el sistema destino — y los publica en la sección
-[Releases](../../releases) del repositorio. El runner de macOS de GitHub es
-Apple Silicon (arm64), por eso ese binario no corre en Macs con procesador
-Intel.
+automáticamente los ejecutables de consola y de interfaz gráfica para
+Windows, macOS y Linux en runners reales de cada sistema operativo —
+necesario porque PyInstaller no cross-compila entre sistemas y algunas
+dependencias (`cryptography`, `lxml`) requieren compilarse en el sistema
+destino — y los publica en la sección [Releases](../../releases) del
+repositorio. El runner de macOS de GitHub es Apple Silicon (arm64), por eso
+ese binario no corre en Macs con procesador Intel.
 
 ### Instalación desde código fuente
 
@@ -187,18 +216,22 @@ source .venv/bin/activate
 pip install -r requirements/requirements.txt
 ```
 
-Se ejecuta con `python3 firmador.py` (mismas opciones y `config.env` que en
-la sección [Instalación](#instalación-en-windows-guía-rápida)).
+Se ejecuta con `python3 firmador.py` (consola) o `python3 firmador_gui.py`
+(interfaz gráfica; requiere Tk/tkinter — en Linux, instala el paquete
+`python3-tk` de tu distro si falta). Ambos comparten la misma lógica de
+configuración y firma en `src/`, y el mismo `config.env` que en la sección
+[Instalación](#instalación-en-windows-guía-rápida).
 
 **Estructura del proyecto**:
 
 ```
 firmador-pfx/
-├── firmador.py           # entry point: python3 firmador.py
+├── firmador.py           # entry point de consola: python3 firmador.py
+├── firmador_gui.py       # entry point de la GUI: python3 firmador_gui.py
 ├── README.md
 ├── config.env.example     # plantilla de configuración
 ├── config.env             # tu configuración (no versionado)
-├── src/                   # código (config, sello, firma)
+├── src/                   # código compartido (config, sello, firma, batch)
 ├── requirements/          # dependencias (runtime y empaquetado)
 ├── certs/                 # tu certificado .pfx (no versionado)
 ├── assets/                # tu imagen de firma
@@ -207,17 +240,19 @@ firmador-pfx/
 └── out/                   # PDFs firmados
 ```
 
-**Compilar el ejecutable localmente**:
+**Compilar los ejecutables localmente**:
 
 ```bash
 pip install -r requirements/requirements-build.txt
 pyinstaller --onefile --name firmador firmador.py
+pyinstaller --onefile --windowed --name firmador-gui firmador_gui.py
 ```
 
-Esto genera `dist/firmador` (o `dist/firmador.exe` en Windows) para el
-sistema operativo en el que lo ejecutes. El binario espera `config.env` y las
-carpetas `certs/`, `assets/`, `in/` y `out/` junto a él (rutas relativas al
-propio ejecutable, no al directorio desde el que se invoque).
+Esto genera `dist/firmador` y `dist/firmador-gui` (o `dist/firmador.exe` /
+`dist/firmador-gui.exe` en Windows) para el sistema operativo en el que los
+ejecutes. Ambos binarios esperan `config.env` y las carpetas `certs/`,
+`assets/`, `in/` y `out/` junto a ellos (rutas relativas al propio
+ejecutable, no al directorio desde el que se invoque).
 
 ### Tecnología usada
 
@@ -226,5 +261,6 @@ propio ejecutable, no al directorio desde el que se invoque).
 - **[Pillow](https://python-pillow.org/)** — composición del sello (nombre, apellido y fecha sobre la imagen de plantilla)
 - **[pypdf](https://pypdf.readthedocs.io/)** — lectura de metadatos del PDF (conteo de páginas) y detección de archivos corruptos
 - **[python-dotenv](https://github.com/theskumar/python-dotenv)** — parseo del archivo de configuración `config.env`
+- **[Tkinter](https://docs.python.org/3/library/tkinter.html)** — interfaz gráfica (`firmador_gui.py`), incluida en Python sin dependencias extra
 - **[PyInstaller](https://pyinstaller.org/)** — empaquetado como ejecutable standalone (sin requerir Python instalado)
-- **[GitHub Actions](.github/workflows/build-executables.yml)** — compila y publica automáticamente los ejecutables de Windows, macOS y Linux al crear un tag de versión
+- **[GitHub Actions](.github/workflows/build-executables.yml)** — compila y publica automáticamente los ejecutables de consola y de interfaz gráfica para Windows, macOS y Linux al crear un tag de versión

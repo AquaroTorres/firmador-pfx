@@ -70,18 +70,7 @@ def _require_path(base: Path, raw: dict, key: str, config_path: Path, label: str
     return resolved
 
 
-def load_config(config_path: str) -> Config:
-    config_path = Path(config_path).resolve()
-    if not config_path.is_file():
-        raise ValueError(
-            f"No se encontró el archivo de configuración: {config_path}\n"
-            f"  Copia 'config.env.example' a 'config.env' "
-            f"(o indica la ruta correcta con --config)."
-        )
-
-    raw = dotenv_values(config_path)
-    base = app_dir()
-
+def build_config(raw: dict, base: Path, config_path: Path) -> Config:
     in_dir = _require_path(base, raw, "IN_DIR", config_path, "la carpeta de entrada (IN_DIR)", "dir")
     pfx_path = _require_path(base, raw, "PFX_PATH", config_path, "el certificado PFX (PFX_PATH)", "file")
     image_path = _require_path(base, raw, "IMAGE_PATH", config_path, "la imagen de la firma (IMAGE_PATH)", "file")
@@ -118,3 +107,16 @@ def load_config(config_path: str) -> Config:
         sign_location=raw.get("SIGN_LOCATION") or None,
         sign_contact_info=raw.get("SIGN_CONTACT_INFO") or None,
     )
+
+
+def load_config(config_path: str) -> Config:
+    config_path = Path(config_path).resolve()
+    if not config_path.is_file():
+        raise ValueError(
+            f"No se encontró el archivo de configuración: {config_path}\n"
+            f"  Copia 'config.env.example' a 'config.env' "
+            f"(o indica la ruta correcta con --config)."
+        )
+
+    raw = dotenv_values(config_path)
+    return build_config(raw, app_dir(), config_path)
