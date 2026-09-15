@@ -163,8 +163,16 @@ class FirmadorGUI:
         page_frame = ttk.Frame(right)
         page_frame.grid(row=row, column=0, columnspan=2, sticky="w", **pad)
         ttk.Label(page_frame, text="Página a firmar:").grid(row=0, column=0)
-        self.page_entry = ttk.Entry(page_frame, textvariable=self.page_number_var, width=6)
+        validate_page = (self.root.register(self._validate_page_input), "%P")
+        self.page_entry = ttk.Entry(
+            page_frame,
+            textvariable=self.page_number_var,
+            width=6,
+            validate="key",
+            validatecommand=validate_page,
+        )
         self.page_entry.grid(row=0, column=1, padx=4)
+        self.page_entry.bind("<FocusOut>", self._clamp_page_number)
         ttk.Checkbutton(
             page_frame,
             text="Última página",
@@ -257,7 +265,20 @@ class FirmadorGUI:
                 self.refresh_pdf_count()
 
     def _toggle_page_entry(self):
-        self.page_entry.configure(state="disabled" if self.last_page_var.get() else "normal")
+        editable = not self.last_page_var.get()
+        self.page_entry.configure(state="normal" if editable else "disabled")
+        if editable and not self.page_number_var.get().strip():
+            self.page_number_var.set("1")
+
+    def _validate_page_input(self, proposed: str) -> bool:
+        # Solo dígitos (o vacío, para poder borrar); el mínimo de 1 se aplica
+        # al salir del campo en _clamp_page_number, no mientras se escribe.
+        return proposed == "" or proposed.isdigit()
+
+    def _clamp_page_number(self, _event=None):
+        value = self.page_number_var.get().strip()
+        page = int(value) if value else 0
+        self.page_number_var.set(str(max(page, 1)))
 
     # --- estado / helpers ---
 
