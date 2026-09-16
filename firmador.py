@@ -2,30 +2,14 @@ import argparse
 import getpass
 import logging
 import sys
-from pathlib import Path
 
-from pypdf import PdfReader
-from pypdf.errors import PdfReadError
-
+from src.batch import list_pdfs, sign_batch
 from src.config import app_dir, load_config
-from src.stamp import build_stamp_image
-from src.signer import load_signer, sign_one_pdf
 
 # pyHanko registra en el logger los errores de carga del PFX con traceback
 # incluido antes de devolver None; ya los reportamos con un mensaje propio,
 # así que se sube el nivel para no duplicar ruido en la salida.
 logging.getLogger("pyhanko").setLevel(logging.CRITICAL)
-
-
-def resolve_page_index(sign_page, num_pages: int) -> int:
-    if sign_page == "last":
-        return -1
-    idx = sign_page - 1
-    if idx < 0 or idx >= num_pages:
-        raise ValueError(
-            f"SIGN_PAGE={sign_page} fuera de rango (el PDF tiene {num_pages} páginas)"
-        )
-    return idx
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -75,8 +59,7 @@ def main() -> int:
 
     apply_overrides(cfg, args)
 
-    pdfs = sorted(cfg.in_dir.glob("*.pdf"))
-    if not pdfs:
+    if not list_pdfs(cfg.in_dir):
         print(f"No se encontraron PDFs en {cfg.in_dir}")
         return 0
 
@@ -87,29 +70,10 @@ def main() -> int:
     )
 
     try:
-        signer = load_signer(cfg.pfx_path, password.encode("utf-8"))
+        resultados = sign_batch(cfg, password)
     except ValueError as e:
         print(f"No se pudo iniciar el firmador:\n{e}")
         return 1
-
-    resultados = []
-    for pdf_path in pdfs:
-        try:
-            reader = PdfReader(str(pdf_path))
-            num_pages = len(reader.pages)
-            page_index = resolve_page_index(cfg.sign_page, num_pages)
-
-            stamp_image = build_stamp_image(cfg)
-            out_path = cfg.out_dir / pdf_path.name
-            sign_one_pdf(pdf_path, out_path, cfg, stamp_image, page_index, signer)
-
-            resultados.append((pdf_path.name, "OK", ""))
-        except PdfReadError:
-            resultados.append((pdf_path.name, "ERROR", "PDF corrupto o ilegible"))
-        except ValueError as e:
-            resultados.append((pdf_path.name, "ERROR", str(e)))
-        except Exception as e:
-            resultados.append((pdf_path.name, "ERROR", f"{type(e).__name__}: {e}"))
 
     print("\n--- Resumen del batch ---")
     ok = sum(1 for _, status, _ in resultados if status == "OK")
