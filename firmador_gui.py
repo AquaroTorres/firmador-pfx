@@ -53,7 +53,7 @@ def config_env_path() -> Path:
 def load_saved_values() -> tuple:
     path = config_env_path()
     if not path.is_file():
-        return dict(DEFAULTS), True, ""
+        return dict(DEFAULTS), True, "", False
 
     raw = dotenv_values(path)
     values = dict(DEFAULTS)
@@ -64,7 +64,8 @@ def load_saved_values() -> tuple:
     sign_page_raw = (raw.get("SIGN_PAGE") or "last").strip()
     last_page = sign_page_raw.lower() == "last"
     page_number = "" if last_page else sign_page_raw
-    return values, last_page, page_number
+    remember_password = bool(raw.get("PFX_PASSWORD"))
+    return values, last_page, page_number, remember_password
 
 
 def write_config_env(values: dict, remember_password: bool) -> None:
@@ -90,11 +91,12 @@ class FirmadorGUI:
         self.queue: "queue.Queue" = queue.Queue()
         self.running = False
 
-        values, last_page, page_number = load_saved_values()
+        values, last_page, page_number, remember_password = load_saved_values()
         for key, value in values.items():
             self.vars[key].set(value)
         self.last_page_var.set(last_page)
         self.page_number_var.set(page_number)
+        self.remember_var.set(remember_password)
 
         self._build_ui()
 
@@ -221,11 +223,13 @@ class FirmadorGUI:
         footer.grid(row=1, column=0, columnspan=2, sticky="ew")
         footer.columnconfigure(0, weight=1)
 
-        status_box = ttk.Frame(footer)
-        status_box.grid(row=0, column=0, sticky="ew")
-        self.status_label = ttk.Label(status_box, textvariable=self.status_var)
+        # wraplength evita que un status_var largo (ej. un nombre de PDF
+        # largo) agrande la etiqueta y, con ella, la ventana entera —así la
+        # barra de abajo, que sí debe ocupar el ancho completo hasta el
+        # botón, mantiene un ancho estable en vez de crecer con el texto.
+        self.status_label = ttk.Label(footer, textvariable=self.status_var, wraplength=760, anchor="w")
         self.status_label.grid(row=0, column=0, sticky="w")
-        self.progress = ttk.Progressbar(status_box, length=320, mode="determinate")
+        self.progress = ttk.Progressbar(footer, mode="determinate")
         self.progress.grid(row=1, column=0, sticky="ew", pady=(4, 0))
 
         buttons = ttk.Frame(footer)
