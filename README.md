@@ -15,8 +15,8 @@ cubre las dos.
 Entra a la sección **[Releases](../../releases)** y descarga el ejecutable
 que prefieras:
 
-- **[firmador-gui.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.0/firmador-gui.exe)** — con ventana y formulario.
-- **[firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.0/firmador.exe)** — por consola.
+- **[firmador-gui.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.1/firmador-gui.exe)** — con ventana y formulario.
+- **[firmador.exe](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.1/firmador.exe)** — por consola.
 
 ### 2. Crea la carpeta de trabajo
 
@@ -103,8 +103,8 @@ cómo lo ejecutas. En **[Releases](../../releases)** vas a encontrar, para
 cada sistema, la versión de consola y la de interfaz gráfica (`-gui`):
 
 - **macOS** (Apple Silicon: M1/M2/M3/M4): descarga
-  [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.0/firmador-macos)
-  o [firmador-gui-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.0/firmador-gui-macos),
+  [firmador-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.1/firmador-macos)
+  o [firmador-gui-macos](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.1/firmador-gui-macos),
   luego en una terminal, dentro de la carpeta del
   programa, ejecuta `chmod +x firmador-macos && ./firmador-macos` (cambia el
   nombre si usas la versión gráfica). La primera vez macOS puede bloquearlo
@@ -113,8 +113,8 @@ cada sistema, la versión de consola y la de interfaz gráfica (`-gui`):
   Intel (no Apple Silicon), usa la
   [instalación desde código fuente](#instalación-desde-código-fuente).
 - **Linux**: descarga
-  [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.0/firmador-linux)
-  o [firmador-gui-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.0/firmador-gui-linux),
+  [firmador-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.1/firmador-linux)
+  o [firmador-gui-linux](https://github.com/AquaroTorres/firmador-pfx/releases/download/v1.1.1/firmador-gui-linux),
   y ejecuta `chmod +x <nombre-del-archivo> &&
   ./<nombre-del-archivo>`.
 
